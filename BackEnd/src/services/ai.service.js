@@ -1,6 +1,9 @@
 const { GoogleGenerativeAI } = require("@google/generative-ai");
 
-const SYSTEM_INSTRUCTION = `
+const genAI = new GoogleGenerativeAI(process.env.GOOGLE_GEMINI_KEY);
+const model = genAI.getGenerativeModel({
+    model: "gemini-2.0-flash",
+    systemInstruction: `
                 Here’s a solid system instruction for your AI code reviewer:
 
                 AI System Instruction: Senior Code Reviewer (7+ Years of Experience)
@@ -73,42 +76,17 @@ const SYSTEM_INSTRUCTION = `
                 Your mission is to ensure every piece of code follows high standards. Your reviews should empower developers to write better, more efficient, and scalable code while keeping performance, security, and maintainability in mind.
 
                 Would you like any adjustments based on your specific needs? 🚀 
-    `;
+    `
+});
 
-const AI_CONFIG = {
-    model: "gemini-2.0-flash",
-    systemInstruction: SYSTEM_INSTRUCTION
-};
 
-class AIService {
-    constructor() {
-        if (!process.env.GOOGLE_GEMINI_KEY) {
-            throw new Error('GOOGLE_GEMINI_KEY is not configured');
-        }
-        this.genAI = new GoogleGenerativeAI(process.env.GOOGLE_GEMINI_KEY);
-        this.model = this.genAI.getGenerativeModel(AI_CONFIG);
-    }
+async function generateContent(prompt) {
+    const result = await model.generateContent(prompt);
 
-    async generateContent(prompt) {
-        try {
-            if (!prompt) {
-                throw new Error('Prompt is required');
-            }
+    console.log(result.response.text())
 
-            const result = await this.model.generateContent(prompt);
-            const response = result.response.text();
+    return result.response.text();
 
-            if (!response) {
-                throw new Error('No response generated');
-            }
-
-            return response;
-        } catch (error) {
-            console.error('Content generation failed:', error);
-            throw new Error(`Failed to generate content: ${error.message}`);
-        }
-    }
 }
 
-const aiService = new AIService();
-module.exports = aiService.generateContent.bind(aiService);
+module.exports = generateContent    

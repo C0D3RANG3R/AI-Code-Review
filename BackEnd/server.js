@@ -1,28 +1,26 @@
 require('dotenv').config();
-const app = require('./src/app');
+const express = require('express');
+const aiRoutes = require('./src/routes/ai.routes');
+const cors = require('cors');
+const path = require('path');
 
-const PORT = process.env.PORT || 3000;
-const HOST = process.env.HOST || 'localhost';
+const app = express();
+const PORT = process.env.PORT || 8000;
+const API_URL = process.env.URL || 'http://localhost:5173';
 
-const server = app.listen(PORT, () => {
-    console.log(`Server is running on http://${HOST}:${PORT}`);
+// Middlewares
+app.use(express.json());
+app.use(cors({ origin: API_URL, credentials: true }));
+
+// Routes
+app.use('/ai', aiRoutes);
+
+// Serve Frontend
+app.use(express.static(path.join(__dirname, "../frontend/dist")));
+app.get("*", (req, res) => {
+    res.sendFile(path.resolve(__dirname, "../frontend/dist/index.html"));
 });
 
-server.on('error', (error) => {
-    if (error.code === 'EADDRINUSE') {
-        console.error(`Port ${PORT} is already in use`);
-    } else {
-        console.error('Server error:', error.message);
-    }
-    process.exit(1);
-});
 
-process.on('uncaughtException', (error) => {
-    console.error('Uncaught Exception:', error.message);
-    process.exit(1);
-});
 
-process.on('unhandledRejection', (reason, promise) => {
-    console.error('Unhandled Rejection at:', promise, 'reason:', reason);
-    process.exit(1);
-});
+app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
