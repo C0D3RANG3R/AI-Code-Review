@@ -17,8 +17,8 @@ app.use('/ai', aiRoutes);
 const FE_DIST_PATH = path.join(__dirname, "../../frontend/dist");
 
 app.use(express.static(FE_DIST_PATH));
-app.get("*", (req, res) => {
-    res.sendFile(path.resolve(FE_DIST_PATH, "../../frontend/dist/index.html"));
+app.get('*', (req, res) => {
+  res.sendFile(path.join(__dirname, '../frontend/dist', 'index.html'));
 });
 
 app.use(errorHandler);
