@@ -1,10 +1,10 @@
 const aiService = require("../services/ai.service");
 
-module.exports.getReview = async (req, res, next) => {
+const getReview = async (req, res, next) => {
     const { code } = req.body;
 
     if (!code) {
-        const error = new Error("Code input is required");
+        const error = new Error("Code input is required.");
         error.status = 400;
         return next(error);
     }
@@ -22,4 +22,8 @@ module.exports.getReview = async (req, res, next) => {
     } catch (error) {
         next(error); 
     }
+};
+
+module.exports = {
+    getReview
 };
